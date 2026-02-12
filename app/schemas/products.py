@@ -1,10 +1,28 @@
-from pydantic import BaseModel, Field, AnyUrl, field_validator, model_validator, computed_field
+from pydantic import BaseModel, Field, AnyUrl, field_validator, model_validator, computed_field, EmailStr
 from typing import List, Optional, Annotated, Literal
 from uuid import UUID
 from datetime import datetime
 
 
+class Seller(BaseModel):
+    id: UUID
+    name:Annotated[str, Field(min_length=3, max_length=50, description="Seller name (3-50 chars)",examples=["BestSeller", "TopShop"])]
+    email: EmailStr
+    website: AnyUrl
 
+class Dimensions(BaseModel):
+    length: Annotated[float, Field(gt=0, description="Length in cm")]
+    width: Annotated[float, Field(gt=0,description="width in cm")]
+    height: Annotated[float, Field(gt=0,description="height in cm")]
+
+field_validator("email",mode="after")
+@classmethod
+def validate_email(cls,value: EmailStr):
+    allowed_domains=["gmail.com","yahoo.cm","outlook.com"]
+    domain=str(value).split("@")[-1].lower()
+    if domain not in allowed_domains:
+        raise ValueError(f"Seller email does not allowed: {domain}")
+    return value
 
 class Products(BaseModel):
     id: UUID
@@ -63,8 +81,8 @@ class Products(BaseModel):
         List[AnyUrl],
         Field(max_length=1, description="At least 1 image url"),
     ]
-
-    #dimension
+    seller: Seller
+    dimensions: Dimensions
 
     @field_validator("sku",mode="after")
     @classmethod
@@ -91,3 +109,8 @@ class Products(BaseModel):
     @property # used to create new field which is not provided by user but calculated based on other fields
     def final_price(self) -> float:
         return round(self.price * (1-self.discount_percent/100),2)
+    
+    @computed_field
+    @property
+    def volume(self) -> float:
+        return round(self.dimensions.length*self.dimensions.width*self.dimensions.height,2)
