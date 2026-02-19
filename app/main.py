@@ -34,5 +34,9 @@ def delete_product(products_id: UUID=Path(...,description="Product UUID")):
     except Exception as e:
         raise HTTPException(status_code=400,detail=str(e))
     
+# @app.put("/products/{products_id}")
+# def update_product(products_id: UUID=Path(...,description="Product UUID"),product:Products=None):
+#     products=get_all_products()
+    
 
 

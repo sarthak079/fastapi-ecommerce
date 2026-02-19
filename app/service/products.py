@@ -35,4 +35,6 @@ def delete_products(id:str)->None:
             deleted=products.pop(idx)
             save_product(products)
             return {"message": "Product deleted successfully", "data": deleted}
+        
+
     
