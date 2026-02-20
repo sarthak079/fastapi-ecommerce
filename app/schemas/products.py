@@ -4,6 +4,7 @@ from uuid import UUID
 from datetime import datetime
 
 
+#Create pydantic
 class Seller(BaseModel):
     id: UUID
     name:Annotated[str, Field(min_length=3, max_length=50, description="Seller name (3-50 chars)",examples=["BestSeller", "TopShop"])]
@@ -115,6 +116,7 @@ class Products(BaseModel):
     def volume(self) -> float:
         return round(self.dimensions.length*self.dimensions.width*self.dimensions.height,2)
     
+#Update models for partial update (PUT/PATCH)
 class SellerUpdate(BaseModel):
     id: Optional[UUID]
     name:Optional[Annotated[str, Field(min_length=3, max_length=50, description="Seller name (3-50 chars)",examples=["BestSeller", "TopShop"])]]

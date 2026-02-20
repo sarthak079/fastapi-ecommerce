@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException, Query, Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Annotated
-from app.schemas.products import Products
+from app.schemas.products import Products,ProductsUpdate
 from uuid import uuid4,UUID
 from datetime import datetime
-from app.service.products import add_product,get_all_products,delete_products
+from app.service.products import add_product, change_product,get_all_products,delete_products
 
 app=FastAPI()
 
@@ -34,9 +34,16 @@ def delete_product(products_id: UUID=Path(...,description="Product UUID")):
     except Exception as e:
         raise HTTPException(status_code=400,detail=str(e))
     
-# @app.put("/products/{products_id}")
-# def update_product(products_id: UUID=Path(...,description="Product UUID"),product:Products=None):
-#     products=get_all_products()
-    
+@app.put("/products/{product_id}")
+def update_product(
+    product_id: UUID=Path(...,description="Product UUID"),
+    payload: ProductsUpdate=...,):
+    try:
+        update_product=change_product(
+            str(product_id),payload.model_dump(mode="json",exclude_unset=True)
+        )
+        return update_product
+    except ValueError as e:
+        raise HTTPException(status_code=400,detail=str(e))
 
 
