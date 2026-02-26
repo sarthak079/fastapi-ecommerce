@@ -5,10 +5,11 @@ from app.schemas.products import Products,ProductsUpdate
 from uuid import uuid4,UUID
 from datetime import datetime
 from app.service.products import add_product, change_product,get_all_products,delete_products
+from typing import List,Dict
 
 app=FastAPI()
 
-@app.get("/")
+@app.get("/",response_model=dict)
 def read_root():
     return {"Hello": "World"}
 
@@ -26,7 +27,7 @@ def create_product(product: Products):
         raise HTTPException(status_code=400,detail=str(e))
     return product.model_dump(mode="json")
 
-@app.delete("/products/{products_id}")
+@app.delete("/products/{products_id}",response_model=dict)
 def delete_product(products_id: UUID=Path(...,description="Product UUID")):
     try:
         res=delete_products(str(products_id))
