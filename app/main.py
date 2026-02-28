@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+import os
 from fastapi import FastAPI, HTTPException, Query, Path, Depends, Request
 from pydantic import BaseModel, Field
 from typing import List, Optional, Annotated
@@ -7,12 +9,14 @@ from datetime import datetime
 from app.service.products import add_product, change_product,get_all_products,delete_products,load_products
 from typing import List,Dict
 
+load_dotenv()
 app=FastAPI()
 
 @app.middleware("http")
 async def lifecycle(request: Request, call_next):
     print("Before request")
     response=await call_next(request)
+    #response["lifecycle"] = "was inside"
     print("After request")
     return response
 
@@ -22,7 +26,8 @@ def depends_logic():# this is dependency func
 
 @app.get("/",response_model=dict)
 def read_root(dependency_result=Depends(depends_logic)):# dependency is used in route para. not in the route, injestion of dependency takes place here
-    return {"Hello": "World","dependency":dependency_result}
+    DB_PATH=os.getenv("BASE_URL")
+    return {"Hello": "World","dependency":dependency_result,"db_path":DB_PATH}
 
 
 
