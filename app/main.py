@@ -8,6 +8,7 @@ from uuid import uuid4,UUID
 from datetime import datetime
 from app.service.products import add_product, change_product,get_all_products,delete_products,load_products
 from typing import List,Dict
+from fastapi.responses import JSONResponse
 
 load_dotenv()
 app=FastAPI()
@@ -27,7 +28,16 @@ def depends_logic():# this is dependency func
 @app.get("/",response_model=dict)
 def read_root(dependency_result=Depends(depends_logic)):# dependency is used in route para. not in the route, injestion of dependency takes place here
     DB_PATH=os.getenv("BASE_URL")
-    return {"Hello": "World","dependency":dependency_result,"db_path":DB_PATH}
+    # return {"Hello": "World","dependency":dependency_result,"db_path":DB_PATH}
+    #or this
+    return JSONResponse(
+        status_code=200,
+        content={
+            "Hello": "World",
+            "dependency":dependency_result,
+            "db_path":DB_PATH
+        },
+    )
 
 
 
